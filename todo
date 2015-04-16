@@ -1,0 +1,9 @@
+commands:
+    toggler workinghard [project] or [project-id]
+        senaste dagen någonting är registrerat registrerat på projektet, 8h varje vardag, till nu
+    
+    toggler sicktoday
+        8 på sjukprojektet idag
+
+    toggler projects
+        list all projects
