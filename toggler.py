@@ -34,6 +34,7 @@ def fillUpFromToday():
     dateOfLatestEntry = findLatestEntry()
     day = dateOfLatestEntry + datetime.timedelta(days=1)
     while day <= datetime.date.today():
+        printDots()
         if not isWeekend(day):
             registerWork(project_id, day)
         day += datetime.timedelta(days=1)
@@ -48,27 +49,16 @@ def findLatestEntry():
         url = "https://www.toggl.com/api/v8/time_entries?start_date=" + todayInIso + "T00:00:00.000Z" + "&end_date=" + todayInIso + "T23:00:00.000Z"
         r = requests.get(url, auth=(api_token, "api_token"))
         if r.json():
-            print "Found an entry for " + todayInIso
             return today
         count += 1
 
 # Register 8 ours of work on a project for a day.
 def registerWork(project_id, day):
     dayInIso = day.isoformat()
-    getProjectName(project_id)
-    print "Registering work for " + dayInIso + " for project " + "(id: " + str(project_id) + ")"
     url = "https://www.toggl.com/api/v8/time_entries"
     data = {"time_entry":{"duration":28800,"start":dayInIso+"T07:00:00.000Z","pid":project_id,"created_with":"toggler.py"}}
     r = requests.post(url, data=json.dumps(data), auth=(api_token, "api_token"))
-
-
-def getProjectName(project_id):
-    url = "https://www.toggl.com/api/v8/workspaces/" + workspace_id + "/projects" 
-    r = requests.get(url, auth=(api_token,"api_token"))
-    for project in r.json():
-        if project["id"] == project_id:
-            print "same id"
-        
+    handleErrors(r.status_code)
 
 # We don't usually work on weekends.
 def isWeekend(day):
@@ -79,6 +69,12 @@ def isWeekend(day):
 def printDots():
     sys.stdout.write(".")
     sys.stdout.flush()
+
+# Handle error codes from API.
+def handleErrors(status_code):
+    if status_code == 400:
+        print "Something went wrong."
+        sys.exit(1)
 
 # Program entry
 commands = { "projects" : printAllProjects, "sick" : registerSickToday, "fillup" : fillUpFromToday }
