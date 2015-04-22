@@ -13,6 +13,14 @@ api_token = config.get("ConfigSection", "api_token")
 workspace_id = config.get("ConfigSection", "workspace_id")
 sick_project_id = config.get("ConfigSection", "sick_project_id")
 
+# Prints all available workspaces
+def printWorkspaces():
+    url = "https://www.toggl.com/api/v8/workspaces"
+    r = requests.get(url, auth=(api_token, "api_token"))
+    handleErrors(r.status_code)
+    for workspace in r.json():
+        print str(workspace["id"]) + " - " + workspace["name"]
+
 # Prints all the projects and id's for the current workspace.
 def printAllProjects():
     url = "https://www.toggl.com/api/v8/workspaces/" + workspace_id + "/projects" 
@@ -81,7 +89,7 @@ def handleErrors(status_code):
         sys.exit(1)
 
 # Program entry
-commands = { "projects" : printAllProjects, "sick" : registerSickToday, "fillup" : fillUpFromToday }
+commands = { "workspaces": printWorkspaces, "projects" : printAllProjects, "sick" : registerSickToday, "fillup" : fillUpFromToday }
 try:
     command = sys.argv[1]
     commands[command]()
