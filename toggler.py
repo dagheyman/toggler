@@ -5,6 +5,10 @@ import ConfigParser
 import sys
 import json
 import datetime
+import os
+
+# Set encoding for std.out
+os.environ["PYTHONIOENCODING"] = "utf-8"
 
 # Load configs
 config = ConfigParser.ConfigParser()
