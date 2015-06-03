@@ -17,10 +17,19 @@ api_token = config.get("ConfigSection", "api_token")
 workspace_id = config.get("ConfigSection", "workspace_id")
 sick_project_id = config.get("ConfigSection", "sick_project_id")
 
+# Prints all available workspaces
+def printWorkspaces():
+    url = "https://www.toggl.com/api/v8/workspaces"
+    r = requests.get(url, auth=(api_token, "api_token"))
+    handleErrors(r.status_code)
+    for workspace in r.json():
+        print str(workspace["id"]) + " - " + workspace["name"]
+
 # Prints all the projects and id's for the current workspace.
 def printAllProjects():
     url = "https://www.toggl.com/api/v8/workspaces/" + workspace_id + "/projects" 
     r = requests.get(url, auth=(api_token,"api_token"))
+    handleErrors(r.status_code)
     for project in r.json():
         print str(project["id"]) + "  -  " + project["name"]
 
@@ -79,9 +88,12 @@ def handleErrors(status_code):
     if status_code == 400:
         print "Something went wrong."
         sys.exit(1)
+    if status_code == 403:
+        print "Toggl refuses the request. Do you have the correct API token?"
+        sys.exit(1)
 
 # Program entry
-commands = { "projects" : printAllProjects, "sick" : registerSickToday, "fillup" : fillUpFromToday }
+commands = { "workspaces": printWorkspaces, "projects" : printAllProjects, "sick" : registerSickToday, "fillup" : fillUpFromToday }
 try:
     command = sys.argv[1]
     commands[command]()
@@ -89,4 +101,5 @@ except (KeyError, IndexError):
     print "No such command."
 except KeyboardInterrupt:
     print "Aborted."
-
+except ValueError:
+    print "Something went wrong."
