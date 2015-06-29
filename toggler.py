@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import requests
-import ConfigParser 
+import configparser 
 import sys
 import json
 import datetime
@@ -11,7 +11,7 @@ import os
 os.environ["PYTHONIOENCODING"] = "utf-8"
 
 # Load configs
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.read("./conf.ini")
 api_token = config.get("ConfigSection", "api_token")
 workspace_id = config.get("ConfigSection", "workspace_id")
@@ -23,7 +23,7 @@ def printWorkspaces():
     r = requests.get(url, auth=(api_token, "api_token"))
     handleErrors(r.status_code)
     for workspace in r.json():
-        print str(workspace["id"]) + " - " + workspace["name"]
+        print (str(workspace["id"]) + " - " + workspace["name"])
 
 # Prints all the projects and id's for the current workspace.
 def printAllProjects():
@@ -31,7 +31,7 @@ def printAllProjects():
     r = requests.get(url, auth=(api_token,"api_token"))
     handleErrors(r.status_code)
     for project in r.json():
-        print str(project["id"]) + "  -  " + project["name"]
+        print (str(project["id"]) + "  -  " + project["name"])
 
 # Registers 8 hours of sickness for today on the predefined sick-project.
 def registerSickToday():
@@ -39,7 +39,7 @@ def registerSickToday():
     today = datetime.date.today().isoformat()
     data = {"time_entry":{"duration":28800,"start":today+"T07:00:00.000Z","pid":sick_project_id,"created_with":"toggler.py"}}
     r = requests.post(url, data=json.dumps(data), auth=(api_token, "api_token"))
-    print "Registered sick today."
+    print ("Registered sick today.")
 
 # Register work for all empty days until today, using the first argument as project id.
 def fillUpFromToday():
@@ -86,10 +86,10 @@ def printDots():
 # Handle error codes from API.
 def handleErrors(status_code):
     if status_code == 400:
-        print "Something went wrong."
+        print ("Something went wrong.")
         sys.exit(1)
     if status_code == 403:
-        print "Toggl refuses the request. Do you have the correct API token?"
+        print ("Toggl refuses the request. Do you have the correct API token?")
         sys.exit(1)
 
 # Program entry
@@ -98,8 +98,8 @@ try:
     command = sys.argv[1]
     commands[command]()
 except (KeyError, IndexError):
-    print "No such command."
+    print ("No such command.")
 except KeyboardInterrupt:
-    print "Aborted."
+    print ("Aborted.")
 except ValueError:
-    print "Something went wrong."
+    print ("Something went wrong.")
