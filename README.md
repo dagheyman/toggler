@@ -1,5 +1,5 @@
 # toggler
-Alternative CLI for Toggl.
+Script to automate some time reporting in Toggl.
 
 # Installation and setup
 
